@@ -5,17 +5,31 @@ import {
   View,
   Linking,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {TextInput} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
+import {login} from '../api';
+import {AuthContext} from '../context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const {login: loginContext} = useContext(AuthContext);
+
   const goToSignup = () => {
     navigation.navigate('Signup');
+  };
+
+  const handleLogin = async () => {
+    const loginObject = {
+      email,
+      password,
+    };
+    const res = await login(loginObject);
+    loginContext(res.message); //pass the token
   };
   return (
     <View style={styles.container}>
@@ -35,7 +49,7 @@ export default function Login() {
           secureTextEntry
           onChangeText={setPassword}
         />
-        <Button title="Login" />
+        <Button title="Login" onPress={handleLogin} />
         <Text>
           Not Registerd?
           <TouchableOpacity onPress={goToSignup}>
